@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Share Location & Camera</title>
+</head>
+<body>
+    <h2>Kirim Lokasi & Kamera ke Telegram</h2>
+    <button onclick="sendLocation()">Kirim Lokasi</button>
+    <button onclick="openCamera()">Kirim Foto</button>
+    
+    <script>
+        const botToken = "7512124419:AAEdjrAberFdb7mg1G1ElXP5sQJm-4OD8gw;// 
+        const chatId = 7553489069; // 
+
+        function sendLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    let latitude = position.coords.latitude;
+                    let longitude = position.coords.longitude;
+                    let url = `https://api.telegram.org/bot${botToken}/sendLocation?chat_id=${chatId}&latitude=${latitude}&longitude=${longitude}`;
+                    fetch(url);
+                    alert("Lokasi berhasil dikirim!");
+                });
+            } else {
+                alert("Geolocation tidak didukung di perangkat ini.");
+            }
+        }
+
+        function openCamera() {
+            let input = document.createElement("input");
+            input.type = "file";
+            input.accept = "image/*";
+            input.capture = "camera";
+            input.onchange = function(event) {
+                let file = event.target.files[0];
+                let formData = new FormData();
+                formData.append("chat_id", chatId);
+                formData.append("photo", file);
+
+                fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => alert("Foto berhasil dikirim!"))
+                .catch(error => alert("Gagal mengirim foto"));
+            };
+            input.click();
+        }
+    </script>
+</body>
+</html>
